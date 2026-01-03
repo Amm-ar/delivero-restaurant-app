@@ -1,0 +1,363 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../config/theme.dart';
+import '../../config/constants.dart';
+import '../../providers/order_provider.dart';
+import '../../models/order_model.dart';
+import 'package:intl/intl.dart';
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _tabs = [
+    const NewOrdersTab(),
+    const PreparingTab(),
+    const HistoryTab(),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<OrderProvider>(context, listen: false).fetchOrders();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Restaurant Dashboard'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              Provider.of<OrderProvider>(context, listen: false).fetchOrders();
+            },
+          ),
+        ],
+      ),
+      body: _tabs[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() => _selectedIndex = index);
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications_active),
+            label: 'New Orders',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.restaurant_menu),
+            label: 'Preparing',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: 'History',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// New Orders Tab
+class NewOrdersTab extends StatelessWidget {
+  const NewOrdersTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<OrderProvider>(
+      builder: (context, provider, child) {
+        if (provider.isLoading) {
+          return Center(child: CircularProgressIndicator(color: AppColors.nileBlue));
+        }
+
+        if (provider.newOrders.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.inbox, size: 80, color: AppColors.gray),
+                const SizedBox(height: 16),
+                Text(
+                  'No new orders',
+                  style: AppTextStyles.h3.copyWith(color: AppColors.gray),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: provider.newOrders.length,
+          itemBuilder: (context, index) {
+            return OrderCard(
+              order: provider.newOrders[index],
+              showActions: true,
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+// Preparing Tab
+class PreparingTab extends StatelessWidget {
+  const PreparingTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<OrderProvider>(
+      builder: (context, provider, child) {
+        if (provider.isLoading) {
+          return Center(child: CircularProgressIndicator(color: AppColors.nileBlue));
+        }
+
+        if (provider.preparingOrders.isEmpty) {
+          return Center(
+            child: Text(
+              'No orders in preparation',
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray),
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: provider.preparingOrders.length,
+          itemBuilder: (context, index) {
+            return OrderCard(
+              order: provider.preparingOrders[index],
+              showActions: true,
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+// History Tab
+class HistoryTab extends StatelessWidget {
+  const HistoryTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<OrderProvider>(
+      builder: (context, provider, child) {
+        if (provider.isLoading) {
+          return Center(child: CircularProgressIndicator(color: AppColors.nileBlue));
+        }
+
+        if (provider.historyOrders.isEmpty) {
+          return Center(
+            child: Text(
+              'No order history',
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray),
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: provider.historyOrders.length,
+          itemBuilder: (context, index) {
+            return OrderCard(
+              order: provider.historyOrders[index],
+              showActions: false,
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+// Order Card Widget
+class OrderCard extends StatelessWidget {
+  final OrderModel order;
+  final bool showActions;
+
+  const OrderCard({
+    super.key,
+    required this.order,
+    this.showActions = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Order #${order.orderNumber}',
+                  style: AppTextStyles.h4,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: _getStatusColor(order.status),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    order.statusText,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: 12),
+            
+            Text(
+              DateFormat('MMM dd, yyyy - hh:mm a').format(order.createdAt),
+              style: AppTextStyles.caption.copyWith(color: AppColors.gray),
+            ),
+            
+            const SizedBox(height: 12),
+            const Divider(),
+            const SizedBox(height: 8),
+            
+            // Order items
+            ...order.items.map((item) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      '${item.quantity}x ${item.name}',
+                      style: AppTextStyles.bodyMedium,
+                    ),
+                  ),
+                  Text(
+                    '${AppConstants.currencySymbol} ${item.price.toStringAsFixed(2)}',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            )),
+            
+            const Divider(),
+            const SizedBox(height: 8),
+            
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Total', style: AppTextStyles.h4),
+                Text(
+                  '${AppConstants.currencySymbol} ${order.pricing.total.toStringAsFixed(2)}',
+                  style: AppTextStyles.h4.copyWith(color: AppColors.nileBlue),
+                ),
+              ],
+            ),
+            
+            if (showActions) ...[
+              const SizedBox(height: 16),
+              _buildActions(context),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActions(BuildContext context) {
+    final provider = Provider.of<OrderProvider>(context, listen: false);
+    
+    if (order.status == 'pending') {
+      return Row(
+        children: [
+          Expanded(
+            child: OutlinedButton(
+              onPressed: () async {
+                await provider.updateStatus(order.id!, 'cancelled');
+              },
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.error,
+              ),
+              child: const Text('Reject'),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () async {
+                await provider.updateStatus(order.id!, 'confirmed');
+              },
+              child: const Text('Accept'),
+            ),
+          ),
+        ],
+      );
+    }
+    
+    if (order.status == 'confirmed') {
+      return ElevatedButton(
+        onPressed: () async {
+          await provider.updateStatus(order.id!, 'preparing');
+        },
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size(double.infinity, 45),
+        ),
+        child: const Text('Start Preparing'),
+      );
+    }
+    
+    if (order.status == 'preparing') {
+      return ElevatedButton(
+        onPressed: () async {
+          await provider.updateStatus(order.id!, 'ready');
+        },
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size(double.infinity, 45),
+        ),
+        child: const Text('Mark as Ready'),
+      );
+    }
+    
+    return const SizedBox();
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'pending':
+        return AppColors.sunsetAmber;
+      case 'confirmed':
+      case 'preparing':
+        return AppColors.nileBlue;
+      case 'ready':
+        return AppColors.palmGreen;
+      case 'delivered':
+        return AppColors.palmGreen;
+      case 'cancelled':
+        return AppColors.error;
+      default:
+        return AppColors.gray;
+    }
+  }
+}
