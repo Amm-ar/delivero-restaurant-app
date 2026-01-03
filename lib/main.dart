@@ -7,6 +7,7 @@ import 'screens/auth/login_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/order_provider.dart';
+import 'providers/restaurant_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,8 +21,9 @@ class RestaurantApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()..initialize()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => RestaurantProvider()),
       ],
       child: MaterialApp(
         title: 'Delivero Restaurant',

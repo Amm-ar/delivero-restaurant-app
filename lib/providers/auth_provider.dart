@@ -56,6 +56,7 @@ class AuthProvider with ChangeNotifier {
     required String email,
     required String phone,
     required String password,
+    String? restaurantName,
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -66,6 +67,7 @@ class AuthProvider with ChangeNotifier {
       email: email,
       phone: phone,
       password: password,
+      restaurantName: restaurantName,
     );
 
     if (result['success']) {

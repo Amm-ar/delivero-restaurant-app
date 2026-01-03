@@ -56,6 +56,7 @@ class AuthService {
     required String email,
     required String phone,
     required String password,
+    String? restaurantName,
   }) async {
     try {
       final response = await _apiService.post(
@@ -66,6 +67,7 @@ class AuthService {
           'phone': phone,
           'password': password,
           'role': 'restaurant',
+          if (restaurantName != null) 'restaurantName': restaurantName,
         },
       );
 

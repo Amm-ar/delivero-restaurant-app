@@ -15,6 +15,7 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _restaurantNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -25,6 +26,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _restaurantNameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     _passwordController.dispose();
@@ -41,6 +43,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       email: _emailController.text.trim(),
       phone: _phoneController.text.trim(),
       password: _passwordController.text,
+      restaurantName: _restaurantNameController.text.trim(),
     );
 
     if (success && mounted) {
@@ -99,6 +102,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your name';
+                    }
+                    return null;
+                  },
+                ),
+                
+                const SizedBox(height: AppSpacing.md),
+                
+                // Restaurant Name field
+                TextFormField(
+                  controller: _restaurantNameController,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: const InputDecoration(
+                    labelText: 'Restaurant Name',
+                    prefixIcon: Icon(Icons.restaurant_outlined),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your restaurant name';
                     }
                     return null;
                   },

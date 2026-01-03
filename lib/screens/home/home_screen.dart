@@ -5,6 +5,9 @@ import '../../config/constants.dart';
 import '../../providers/order_provider.dart';
 import '../../models/order_model.dart';
 import 'package:intl/intl.dart';
+import '../../providers/auth_provider.dart';
+import '../restaurant/create_restaurant_screen.dart';
+import '../restaurant/manage_menu_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -43,6 +46,70 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: Consumer<AuthProvider>(
+          builder: (context, auth, child) => ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  gradient: AppColors.primaryGradient,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    const CircleAvatar(
+                      radius: 30,
+                      backgroundColor: Colors.white,
+                      child: Icon(Icons.restaurant, size: 30, color: AppColors.nileBlue),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      auth.user?.name ?? 'Restaurant Owner',
+                      style: AppTextStyles.h4.copyWith(color: Colors.white),
+                    ),
+                    Text(
+                      auth.user?.email ?? '',
+                      style: AppTextStyles.bodySmall.copyWith(color: Colors.white70),
+                    ),
+                  ],
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.store_outlined, color: AppColors.nileBlue),
+                title: const Text('Restaurant Profile'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CreateRestaurantScreen()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.menu_book_outlined, color: AppColors.nileBlue),
+                title: const Text('Manage Menu'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ManageMenuScreen()),
+                  );
+                },
+              ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.logout, color: AppColors.error),
+                title: const Text('Logout'),
+                onTap: () {
+                  auth.logout();
+                },
+              ),
+            ],
+          ),
+        ),
       ),
       body: _tabs[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
