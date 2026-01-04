@@ -8,6 +8,11 @@ import 'package:intl/intl.dart';
 import '../../providers/auth_provider.dart';
 import '../restaurant/create_restaurant_screen.dart';
 import '../restaurant/manage_menu_screen.dart';
+import '../restaurant/analytics_screen.dart';
+import 'dart:async';
+import '../../providers/restaurant_provider.dart';
+import '../../services/socket_service.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,7 +35,57 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<OrderProvider>(context, listen: false).fetchOrders();
+      Provider.of<RestaurantProvider>(context, listen: false).fetchMyRestaurant();
+      _setupSocket();
     });
+  }
+
+  Future<void> _setupSocket() async {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    if (auth.user != null) {
+      final token = await const FlutterSecureStorage().read(key: StorageKeys.accessToken);
+      final socketService = SocketService();
+      socketService.connect(token ?? '', auth.user!.id);
+      
+      socketService.on('newOrder', (data) {
+        if (mounted) {
+          _showNewOrderAlert(data);
+          Provider.of<OrderProvider>(context, listen: false).fetchOrders();
+        }
+      });
+    }
+  }
+
+  void _showNewOrderAlert(dynamic data) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+             Icon(Icons.notifications_active, color: AppColors.sunsetAmber),
+             SizedBox(width: 8),
+             Text('New Order!'),
+          ],
+        ),
+        content: Text('You have a new order #${data['orderNumber']}.\nAmount: ${AppConstants.currencySymbol} ${data['total']}'),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              setState(() => _selectedIndex = 0);
+            },
+            child: const Text('View Orders'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    SocketService().disconnect();
+    super.dispose();
   }
 
   @override
@@ -39,6 +94,30 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Restaurant Dashboard'),
         actions: [
+          // Status Toggle
+          Consumer<RestaurantProvider>(
+            builder: (context, provider, _) {
+              if (provider.restaurant == null) return const SizedBox();
+              final isOpen = provider.restaurant!['isOpen'] ?? false;
+              return Row(
+                children: [
+                   Text(
+                    isOpen ? 'OPEN' : 'CLOSED',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: isOpen ? AppColors.palmGreen : AppColors.error,
+                    ),
+                  ),
+                  Switch(
+                    value: isOpen,
+                    onChanged: (_) => provider.toggleStatus(),
+                    activeColor: AppColors.palmGreen,
+                  ),
+                ],
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
@@ -96,6 +175,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const ManageMenuScreen()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.analytics_outlined, color: AppColors.nileBlue),
+                title: const Text('Business Analytics'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => AnalyticsScreen()),
                   );
                 },
               ),

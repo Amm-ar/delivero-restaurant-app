@@ -8,10 +8,12 @@ class RestaurantService {
   Future<Map<String, dynamic>> getMyRestaurant() async {
     try {
       final response = await _apiService.get('/api/auth/me');
-      if (response['success'] && response['data']['restaurantProfile'] != null) {
-        final restaurantId = response['data']['restaurantProfile'];
+      final responseData = response.data as Map<String, dynamic>;
+      
+      if (responseData['success'] && responseData['data']['restaurantProfile'] != null) {
+        final restaurantId = responseData['data']['restaurantProfile'];
         final restaurantRes = await _apiService.get('/api/restaurants/$restaurantId');
-        return restaurantRes;
+        return restaurantRes.data as Map<String, dynamic>;
       }
       return {'success': false, 'message': 'Restaurant profile not found'};
     } catch (e) {
@@ -23,17 +25,37 @@ class RestaurantService {
   Future<Map<String, dynamic>> updateProfile(String id, Map<String, dynamic> data) async {
     try {
       final response = await _apiService.put('/api/restaurants/$id', data: data);
-      return response;
+      return response.data as Map<String, dynamic>;
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  // Toggle restaurant open/close status
+  Future<Map<String, dynamic>> toggleStatus(String id) async {
+    try {
+      final response = await _apiService.put('/api/restaurants/$id/toggle-status');
+      return response.data as Map<String, dynamic>;
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  // Get restaurant menu items
+  Future<Map<String, dynamic>> getMenuItems(String restaurantId) async {
+    try {
+      final response = await _apiService.get('/api/restaurants/$restaurantId/menu');
+      return response.data as Map<String, dynamic>;
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
   }
 
   // Add menu item
-  Future<Map<String, dynamic>> addMenuItem(Map<String, dynamic> data) async {
+  Future<Map<String, dynamic>> addMenuItem(String restaurantId, Map<String, dynamic> data) async {
     try {
-      final response = await _apiService.post('/api/menu-items', data: data);
-      return response;
+      final response = await _apiService.post('/api/restaurants/$restaurantId/menu', data: data);
+      return response.data as Map<String, dynamic>;
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
@@ -42,8 +64,8 @@ class RestaurantService {
   // Update menu item
   Future<Map<String, dynamic>> updateMenuItem(String id, Map<String, dynamic> data) async {
     try {
-      final response = await _apiService.put('/api/menu-items/$id', data: data);
-      return response;
+      final response = await _apiService.put('/api/menu/$id', data: data);
+      return response.data as Map<String, dynamic>;
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
@@ -52,10 +74,21 @@ class RestaurantService {
   // Delete menu item
   Future<Map<String, dynamic>> deleteMenuItem(String id) async {
     try {
-      final response = await _apiService.delete('/api/menu-items/$id');
-      return response;
+      final response = await _apiService.delete('/api/menu/$id');
+      return response.data as Map<String, dynamic>;
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  // Toggle menu item availability
+  Future<Map<String, dynamic>> toggleMenuItemAvailability(String id) async {
+    try {
+      final response = await _apiService.put('/api/menu/$id/toggle');
+      return response.data as Map<String, dynamic>;
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
   }
 }
+
