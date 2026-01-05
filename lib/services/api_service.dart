@@ -29,6 +29,15 @@ class ApiService {
           if (_token != null) {
             options.headers['Authorization'] = 'Bearer $_token';
           }
+
+          // Remove Content-Type for FormData to let Dio set it with boundary
+          if (options.data is FormData) {
+            options.headers.remove('Content-Type');
+          }
+          
+          print('API Request: ${options.method} ${options.path}');
+          print('API Headers: ${options.headers}');
+          print('API Data: ${options.data}');
           return handler.next(options);
         },
         onResponse: (response, handler) {

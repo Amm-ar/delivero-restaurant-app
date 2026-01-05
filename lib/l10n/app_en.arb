@@ -1,0 +1,21 @@
+{
+  "appTitle": "Delivero Partner",
+  "dashboard": "Dashboard",
+  "menu": "Menu",
+  "orders": "Orders",
+  "profile": "Profile",
+  "login": "Login",
+  "language": "Language",
+  "settings": "Settings",
+  "logout": "Logout",
+  "restaurantName": "Restaurant Name",
+  "description": "Description",
+  "phone": "Phone Number",
+  "address": "Address",
+  "save": "Save Changes",
+  "location": "Location",
+  "cuisine": "Cuisine",
+  "minOrder": "Minimum Order",
+  "deliveryFee": "Delivery Fee",
+  "deliveryTime": "Delivery Time (min)"
+}

@@ -1,0 +1,21 @@
+{
+  "appTitle": "شريك ديليفرو",
+  "dashboard": "لوحة التحكم",
+  "menu": "القائمة",
+  "orders": "الطلبات",
+  "profile": "الملف الشخصي",
+  "login": "تسجيل الدخول",
+  "language": "اللغة",
+  "settings": "الإعدادات",
+  "logout": "تسجيل الخروج",
+  "restaurantName": "اسم المطعم",
+  "description": "الوصف",
+  "phone": "رقم الهاتف",
+  "address": "العنوان",
+  "save": "حفظ التغييرات",
+  "location": "الموقع",
+  "cuisine": "نوع المطبخ",
+  "minOrder": "الحد الأدنى للطلب",
+  "deliveryFee": "رسوم التوصيل",
+  "deliveryTime": "وقت التوصيل (دقيقة)"
+}

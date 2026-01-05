@@ -9,6 +9,9 @@ import 'providers/auth_provider.dart';
 import 'providers/order_provider.dart';
 import 'providers/restaurant_provider.dart';
 import 'providers/analytics_provider.dart';
+import 'providers/locale_provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,14 +29,30 @@ class RestaurantApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => OrderProvider()),
         ChangeNotifierProvider(create: (_) => RestaurantProvider()),
         ChangeNotifierProvider(create: (_) => AnalyticsProvider()),
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
       ],
-      child: MaterialApp(
-        title: 'Delivero Restaurant',
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.light,
-        debugShowCheckedModeBanner: false,
-        home: const AuthWrapper(),
+      child: Consumer<LocaleProvider>(
+        builder: (context, localeProvider, child) {
+          return MaterialApp(
+            title: 'Delivero Restaurant',
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: ThemeMode.light,
+            debugShowCheckedModeBanner: false,
+            locale: localeProvider.locale,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en'),
+              Locale('ar'),
+            ],
+            home: const AuthWrapper(),
+          );
+        },
       ),
     );
   }

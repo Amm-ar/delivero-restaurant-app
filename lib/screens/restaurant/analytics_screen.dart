@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import '../../config/theme.dart';
 import '../../providers/analytics_provider.dart';
 import '../../providers/restaurant_provider.dart';
+import '../../config/constants.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});
@@ -19,7 +20,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final restaurant = Provider.of<RestaurantProvider>(context, listen: false).restaurant;
       if (restaurant != null) {
-        Provider.of<AnalyticsProvider>(context, listen: false).fetchAnalytics(restaurant.id);
+        Provider.of<AnalyticsProvider>(context, listen: false).fetchAnalytics(restaurant['_id']);
       }
     });
   }
@@ -58,13 +59,13 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 const SizedBox(height: 24),
 
                 // Revenue Chart
-                Text('Revenue (Last 7 Days)', style: AppTextStyles.h4),
+                const Text('Revenue (Last 7 Days)', style: AppTextStyles.h4),
                 const SizedBox(height: 16),
                 _buildRevenueChart(dailyStats),
                 const SizedBox(height: 24),
 
                 // Top Selling Items
-                Text('Top Selling Items', style: AppTextStyles.h4),
+                const Text('Top Selling Items', style: AppTextStyles.h4),
                 const SizedBox(height: 16),
                 _buildTopItemsList(data['topItems'] as List),
               ],
@@ -84,9 +85,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       crossAxisSpacing: 12,
       mainAxisSpacing: 12,
       children: [
-        _buildStatCard('Total Revenue', '$\${(summary['totalRevenue'] as num).toStringAsFixed(2)}', Icons.attach_money, AppColors.palmGreen),
+        _buildStatCard('Total Revenue', "${AppConstants.currencySymbol} ${(summary['totalRevenue'] as num).toStringAsFixed(2)}", Icons.attach_money, AppColors.palmGreen),
         _buildStatCard('Total Orders', summary['totalOrders'].toString(), Icons.shopping_basket, AppColors.nileBlue),
-        _buildStatCard('Avg. Order', '$\${(summary['averageOrderValue'] as num).toStringAsFixed(2)}', Icons.trending_up, AppColors.sunsetAmber),
+        _buildStatCard('Avg. Order', "${AppConstants.currencySymbol} ${(summary['averageOrderValue'] as num).toStringAsFixed(2)}", Icons.trending_up, AppColors.sunsetAmber),
         _buildStatCard('Completed', summary['completedOrders'].toString(), Icons.check_circle, Colors.green),
       ],
     );
@@ -166,9 +167,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           margin: const EdgeInsets.only(bottom: 8),
           child: ListTile(
             title: Text(item['name'] ?? 'Unknown Item'),
-            subtitle: Text('\${item['totalQuantity']} units sold'),
+            subtitle: Text("${item['totalQuantity']} units sold"),
             trailing: Text(
-              '$\${(item['totalRevenue'] as num).toStringAsFixed(2)}',
+              "${AppConstants.currencySymbol} ${(item['totalRevenue'] as num).toStringAsFixed(2)}",
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 import '../services/restaurant_service.dart';
 import '../models/menu_item_model.dart';
 
@@ -20,39 +21,60 @@ class RestaurantProvider with ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    final result = await _restaurantService.getMyRestaurant();
-    if (result['success']) {
-      _restaurant = result['data'];
-      if (_restaurant != null) {
-        await fetchMenuItems();
+    try {
+      final result = await _restaurantService.getMyRestaurant();
+      if (result['success'] == true) {
+        _restaurant = result['data'];
+        if (_restaurant != null) {
+          await fetchMenuItems();
+        }
+      } else {
+        _errorMessage = result['message'];
       }
-    } else {
-      _errorMessage = result['message'];
+    } catch (e) {
+      _errorMessage = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
-
-    _isLoading = false;
-    notifyListeners();
   }
 
   Future<bool> updateProfile(Map<String, dynamic> data) async {
-    if (_restaurant == null) return false;
-    
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
-    final result = await _restaurantService.updateProfile(_restaurant!['_id'], data);
-    
-    if (result['success']) {
-      _restaurant = result['data'];
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } else {
-      _errorMessage = result['message'];
-      _isLoading = false;
-      notifyListeners();
+    print('Provider: updateProfile called with data: $data');
+    print('Provider: current _restaurant: $_restaurant');
+
+    try {
+      Map<String, dynamic> result;
+      if (_restaurant == null) {
+        print('Provider: Calling createProfile');
+        result = await _restaurantService.createProfile(data);
+      } else {
+        print('Provider: Calling updateProfile for id: ${_restaurant!['_id']}');
+        result = await _restaurantService.updateProfile(_restaurant!['_id'], data);
+      }
+      
+      print('Provider: Result received: $result');
+
+      if (result['success'] == true) {
+        _restaurant = result['data'];
+        return true;
+      } else {
+        _errorMessage = result['message'];
+        print('Provider: Error message set: $_errorMessage');
+        return false;
+      }
+    } catch (e, stackTrace) {
+      print('Provider: EXCEPTION caught: $e');
+      print('Provider: Stack trace: $stackTrace');
+      _errorMessage = e.toString();
       return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -152,6 +174,29 @@ class RestaurantProvider with ChangeNotifier {
         );
         notifyListeners();
       }
+    }
+  }
+
+  Future<String?> uploadImage(File imageFile) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final result = await _restaurantService.uploadImage(imageFile);
+      
+      if (result['success'] == true || result['imageUrl'] != null) {
+        return result['imageUrl'];
+      } else {
+        _errorMessage = result['message'];
+        return null;
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
+      return null;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 }
