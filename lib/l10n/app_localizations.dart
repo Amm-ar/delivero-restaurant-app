@@ -211,6 +211,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delivery Time (min)'**
   String get deliveryTime;
+
+  /// No description provided for @appearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
+
+  /// No description provided for @darkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Mode'**
+  String get darkMode;
 }
 
 class _AppLocalizationsDelegate

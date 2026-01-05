@@ -17,5 +17,7 @@
   "cuisine": "Cuisine",
   "minOrder": "Minimum Order",
   "deliveryFee": "Delivery Fee",
-  "deliveryTime": "Delivery Time (min)"
+  "deliveryTime": "Delivery Time (min)",
+  "appearance": "Appearance",
+  "darkMode": "Dark Mode"
 }

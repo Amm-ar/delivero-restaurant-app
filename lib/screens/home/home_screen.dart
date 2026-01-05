@@ -13,6 +13,9 @@ import 'dart:async';
 import '../../providers/restaurant_provider.dart';
 import '../../services/socket_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../../providers/theme_provider.dart';
+import '../../providers/locale_provider.dart';
+import '../../l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -187,9 +190,53 @@ class _HomeScreenState extends State<HomeScreen> {
                     context,
                     MaterialPageRoute(builder: (_) => AnalyticsScreen()),
                   );
-                },
+                  },
               ),
               const Divider(),
+              Consumer<ThemeProvider>(
+                builder: (context, themeProvider, _) => SwitchListTile(
+                  title: Text(AppLocalizations.of(context)!.darkMode),
+                  secondary: const Icon(Icons.dark_mode, color: AppColors.nileBlue),
+                  value: themeProvider.isDarkMode,
+                  onChanged: (val) => themeProvider.toggleTheme(val),
+                ),
+              ),
+              Consumer<LocaleProvider>(
+                builder: (context, localeProvider, _) => ListTile(
+                  leading: const Icon(Icons.language, color: AppColors.nileBlue),
+                  title: Text(AppLocalizations.of(context)!.language),
+                  trailing: Text(localeProvider.locale.languageCode == 'ar' ? 'العربية' : 'English'),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text(AppLocalizations.of(context)!.language),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ListTile(
+                              title: const Text('English'),
+                              onTap: () {
+                                localeProvider.setLocale(const Locale('en'));
+                                Navigator.pop(context);
+                              },
+                              trailing: localeProvider.locale.languageCode == 'en' ? const Icon(Icons.check, color: AppColors.nileBlue) : null,
+                            ),
+                            ListTile(
+                              title: const Text('العربية'),
+                              onTap: () {
+                                localeProvider.setLocale(const Locale('ar'));
+                                Navigator.pop(context);
+                              },
+                              trailing: localeProvider.locale.languageCode == 'ar' ? const Icon(Icons.check, color: AppColors.nileBlue) : null,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
               ListTile(
                 leading: const Icon(Icons.logout, color: AppColors.error),
                 title: const Text('Logout'),

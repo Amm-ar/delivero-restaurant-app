@@ -198,7 +198,7 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
                       image: (_imageFile != null)
                         ? DecorationImage(image: FileImage(_imageFile!), fit: BoxFit.cover)
                         : (widget.item?.image != null && widget.item!.image != 'default-food.png')
-                          ? DecorationImage(image: NetworkImage("${ApiConstants.baseUrl}${widget.item!.image}"), fit: BoxFit.cover)
+                          ? DecorationImage(image: NetworkImage(ApiConstants.getImageUrl(widget.item!.image)), fit: BoxFit.cover)
                           : null,
                     ),
                     child: (_imageFile == null && (widget.item?.image == null || widget.item!.image == 'default-food.png'))

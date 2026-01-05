@@ -64,4 +64,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get deliveryTime => 'وقت التوصيل (دقيقة)';
+
+  @override
+  String get appearance => 'المظهر';
+
+  @override
+  String get darkMode => 'الوضع الداكن';
 }

@@ -13,7 +13,7 @@ class ApiService {
     _dio = Dio(
       BaseOptions(
         baseUrl: ApiConstants.baseUrl,
-        connectTimeout: ApiConstants.connectionTimeout,
+        connectTimeout: ApiConstants.connectTimeout,
         receiveTimeout: ApiConstants.receiveTimeout,
         headers: {
           'Content-Type': 'application/json',
@@ -46,6 +46,10 @@ class ApiService {
         onError: (error, handler) {
           // Handle errors globally
           print('API Error: ${error.message}');
+          if (error.response != null) {
+            print('API Error Response Data: ${error.response?.data}');
+            print('API Error Response Status: ${error.response?.statusCode}');
+          }
           return handler.next(error);
         },
       ),

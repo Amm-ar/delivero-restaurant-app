@@ -64,4 +64,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deliveryTime => 'Delivery Time (min)';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get darkMode => 'Dark Mode';
 }

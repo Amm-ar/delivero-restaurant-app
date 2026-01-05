@@ -116,7 +116,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: Image.network(
-            item.image.startsWith('http') ? item.image : '${ApiConstants.baseUrl}/uploads/${item.image}',
+            ApiConstants.getImageUrl(item.image),
             width: 60,
             height: 60,
             fit: BoxFit.cover,

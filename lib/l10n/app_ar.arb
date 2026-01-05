@@ -17,5 +17,7 @@
   "cuisine": "نوع المطبخ",
   "minOrder": "الحد الأدنى للطلب",
   "deliveryFee": "رسوم التوصيل",
-  "deliveryTime": "وقت التوصيل (دقيقة)"
+  "deliveryTime": "وقت التوصيل (دقيقة)",
+  "appearance": "المظهر",
+  "darkMode": "الوضع الداكن"
 }
