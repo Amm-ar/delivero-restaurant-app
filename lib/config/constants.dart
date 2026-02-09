@@ -72,7 +72,7 @@ class AppConstants {
   };
   
   // Payment methods
-  static const List<String> paymentMethods = ['card', 'cash'];
+  static const List<String> paymentMethods = ['card', 'cash', 'wallet'];
   
   // Cuisine types
   static const List<String> cuisineTypes = [
